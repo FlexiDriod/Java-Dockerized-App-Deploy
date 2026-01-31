@@ -299,19 +299,37 @@ public class ECSDeployer {
             }
 
             // ---------- 3️⃣ Wait for Task ----------
-            String taskArn = waitForTask(ecs, clusterName, serviceName);
-            Task task = waitForTaskRunning(ecs, clusterName, taskArn);
+            // ---------------- 5️⃣ Wait for ECS task to get Public IP ----------------
+            logger.info("Fetching ECS task public IP...");
+            String taskArn = ecs.listTasks(new ListTasksRequest()
+                            .withCluster(clusterName)
+                            .withServiceName(serviceName))
+                    .getTaskArns()
+                    .get(0);
+            DescribeTasksResult taskDetail = ecs.describeTasks(
+                    new DescribeTasksRequest()
+                            .withCluster(clusterName)
+                            .withTasks(taskArn)
+            );
 
-            // ---------- 4️⃣ Fetch Public IP ----------
-            String publicIp = waitForPublicIp(task);
+            Task firstTask = taskDetail.getTasks().isEmpty() ? null : taskDetail.getTasks().get(0);
+            if (firstTask == null) {
+                throw new RuntimeException("No task details found");
+            }
+
+            List<KeyValuePair> attachmentDetails = firstTask.getAttachments().isEmpty() ? List.of() : firstTask.getAttachments().get(0).getDetails();
+
+            String publicIp = attachmentDetails.stream()
+                    .filter(d -> d.getName().equals("publicIPv4Address"))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Public IP not found"))
+                    .getValue();
+
             String healthUrl = "http://" + publicIp + ":8080/health";
+            logger.info("Health check URL: {}", healthUrl);
 
-            logger.info("Health URL: {}", healthUrl);
-
-            // ---------- 5️⃣ Health Check ----------
-            waitForHealthyContainer(healthUrl);
-
-            logger.info("🚀 Deployment SUCCESSFUL");
+            // ---------------- 6️⃣ Wait for container readiness ----------------
+            waitForHealthyContainer(healthUrl); // 5 min timeout, 10 sec interval
 
         } catch (Exception e) {
             logger.error("Deployment failed", e);
