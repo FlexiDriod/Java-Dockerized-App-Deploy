@@ -63,7 +63,13 @@ public class ECSDeployer {
                                     "awslogs-region", awsRegion,
                                     "awslogs-stream-prefix", "ecs"
                             ))
-                    );
+                    ).withHealthCheck(new HealthCheck()
+                .withCommand("CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1")
+                .withInterval(10)
+                .withRetries(3)
+                .withStartPeriod(30)
+                .withTimeout(5)
+        );
 
             RegisterTaskDefinitionRequest taskDefRequest = new RegisterTaskDefinitionRequest()
                     .withFamily("java-docker-app")
