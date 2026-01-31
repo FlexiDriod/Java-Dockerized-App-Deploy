@@ -68,14 +68,13 @@ public class ECSDeployer {
             System.out.println("Registered Task Definition ARN: " + taskDefArn);
 
             // ---------------- 2️⃣ Check if ECS Service exists ----------------
-            DescribeServicesRequest describeRequest = new DescribeServicesRequest()
-                    .withCluster(clusterName)
-                    .withServices(serviceName);
+            DescribeServicesRequest describeRequest = new DescribeServicesRequest().withCluster(clusterName).withServices(serviceName);
 
             DescribeServicesResult describeResult = ecs.describeServices(describeRequest);
             List<Service> services = describeResult.getServices();
+            Service firstService = services.isEmpty() ? null : services.get(0);
 
-            if (services.isEmpty() || services.getFirst().getStatus().equals("INACTIVE")) {
+            if (firstService == null  || firstService.getStatus().equals("INACTIVE")) {
                 // ---------------- 3️⃣ Create ECS Service ----------------
                 CreateServiceRequest createRequest = new CreateServiceRequest()
                         .withCluster(clusterName)
@@ -111,16 +110,21 @@ public class ECSDeployer {
                             .withCluster(clusterName)
                             .withServiceName(serviceName))
                     .getTaskArns()
-                    .getFirst();
+                    .get(0);
             DescribeTasksResult taskDetail = ecs.describeTasks(
                     new DescribeTasksRequest()
                             .withCluster(clusterName)
                             .withTasks(taskArn)
             );
 
-            String publicIp = taskDetail.getTasks().getFirst()
-                    .getAttachments().getFirst()
-                    .getDetails().stream()
+            Task firstTask = taskDetail.getTasks().isEmpty() ? null : taskDetail.getTasks().get(0);
+            if (firstTask == null) {
+                throw new RuntimeException("No task details found");
+            }
+
+            List<KeyValuePair> attachmentDetails = firstTask.getAttachments().isEmpty() ? List.of() : firstTask.getAttachments().get(0).getDetails();
+
+            String publicIp = attachmentDetails.stream()
                     .filter(d -> d.getName().equals("publicIPv4Address"))
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Public IP not found"))
