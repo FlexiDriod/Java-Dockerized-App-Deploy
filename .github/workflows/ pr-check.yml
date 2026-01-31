@@ -1,0 +1,33 @@
+name: pr-check.yml
+# Trigger condition: This workflow runs automatically whenever a Pull Request is opened,
+# updated (new commits), or reopened
+on: [pull_request]
+
+jobs:
+  # Job name: quality
+  # Purpose: Ensure code quality before merging PRs
+  quality:
+    # GitHub-hosted runner (Linux VM)
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the source code from the PR branch
+      - uses: actions/checkout@v4
+        # Step 2: Set up Java environment
+        # - Installs Java 17 (Temurin distribution)
+        # - Ensures build consistency across developers and CI
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      # Step 3: Run unit tests
+      # - Executes all tests defined in src/test
+      # - Fails the PR if any test fails
+      - name: Run Tests
+        run: mvn test
+
+      # Step 4: Code style / static analysis check
+      # - Uses Maven Checkstyle plugin
+      # - Enforces coding standards (enterprise-ready practice)
+      # - Prevents poorly formatted or non-compliant code from merging
+      - name: Code Style
+        run: mvn checkstyle:check
