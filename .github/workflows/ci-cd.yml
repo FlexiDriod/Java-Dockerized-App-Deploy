@@ -62,10 +62,15 @@ jobs:
           docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
           docker push $ECR_URI:$IMAGE_TAG
 
+      - name: Inspect JAR contents
+        run: |
+          jar tf target/*.jar | grep ECSDeployer || echo "Class not found!"
+
       # 8️⃣ Deploy to ECS using Java ECSDeployer
       - name: Deploy using Java ECSDeployer
         run: |
           export DOCKER_IMAGE=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
           java -cp target/*.jar devlab.sudip.java_deploy.ECSDeployer
+      
 
 
