@@ -28,7 +28,7 @@ public class ECSDeployer {
         // ---------------- Configuration ----------------
         String clusterName = "enterprise-java-cluster";
         String serviceName = "java-docker-service";
-        String image = "450372565696.dkr.ecr.ap-south-1.amazonaws.com/java-docker-app:latest";
+        String image ="450372565696.dkr.ecr.ap-south-1.amazonaws.com/java-docker-app:e331aa242bbb10f255aad4c406c05a5402f5db42";
         String awsRegion = "ap-south-1";
          if (clusterName == null || serviceName == null || image == null || awsRegion == null) {
             throw new RuntimeException("One or more required environment variables are missing");
