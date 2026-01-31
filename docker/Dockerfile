@@ -1,12 +1,12 @@
 # -----------------------------
 # 1️⃣ Build stage (Java 21 + Maven)
 # -----------------------------
-FROM maven:3.9.3-temurin-21-slim AS build
+FROM maven:3.9.12-eclipse-temurin-21 AS build
 LABEL authors="Sudip"
 
 WORKDIR /build
 
-# Copy pom.xml first (cache dependencies)
+# Copy pom.xml first (caching dependencies)
 COPY pom.xml ./
 RUN mvn dependency:go-offline
 
@@ -17,13 +17,13 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # -----------------------------
-# 2️⃣ Runtime stage (Java 21 JRE)
+# 2️⃣ Runtime stage (Java 21 JRE Debian)
 # -----------------------------
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre
 LABEL authors="Sudip"
 
 # Create non-root user
-RUN addgroup -S app && adduser -S app -G app
+RUN addgroup --system app && adduser --system --ingroup app app
 USER app
 
 WORKDIR /app
