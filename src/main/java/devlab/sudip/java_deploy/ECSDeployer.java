@@ -32,6 +32,14 @@ public class ECSDeployer {
 //        String subnetCsv = System.getenv("SUBNETS");       // comma-separated
         String sgCsv = System.getenv("SECURITY_GROUPS");  // comma-separated
 
+        if (clusterName == null || serviceName == null || image == null || awsRegion == null) {
+            throw new RuntimeException("One or more required environment variables are missing");
+        }
+
+        if (sgCsv == null || sgCsv.isBlank()) {
+            throw new RuntimeException("SECURITY_GROUPS env variable is not set");
+        }
+
 //        String[] subnets = subnetCsv.split(",");
         String[] securityGroups = sgCsv.split(",");
 
@@ -68,7 +76,8 @@ public class ECSDeployer {
                     .withRequiresCompatibilities(Compatibility.FARGATE)
                     .withCpu("256")
                     .withMemory("512")
-                    .withContainerDefinitions(container);
+                    .withContainerDefinitions(container)
+                    .withExecutionRoleArn("arn:aws:iam::450372565696:role/ECSJavaAppExecutionRole");
 
             RegisterTaskDefinitionResult taskDefResult = ecs.registerTaskDefinition(taskDefRequest);
             String taskDefArn = taskDefResult.getTaskDefinition().getTaskDefinitionArn();
