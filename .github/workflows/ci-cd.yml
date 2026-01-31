@@ -70,7 +70,7 @@ jobs:
       - name: Deploy using Java ECSDeployer
         run: |
           export DOCKER_IMAGE=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-          java -cp target/dock-deploy-1.0.0.jar;target/lib/* devlab.sudip.java_deploy.ECSDeployer
+          java -jar target/dock-deploy-1.0.0.jar
       
 
 

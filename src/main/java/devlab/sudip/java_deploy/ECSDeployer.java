@@ -17,15 +17,22 @@ public class ECSDeployer {
     private static final Logger logger = LoggerFactory.getLogger(ECSDeployer.class);
 
     public static void main(String[] args) {
+        // Hardcoded subnets
+        String subnetCsv = "subnet-09ef764a2d1106d7d,subnet-0e43ae9ec9b7737ce";
+
+        String[] subnets = subnetCsv.split(",");
+        for (String subnet : subnets) {
+            System.out.println("Deploying to subnet: " + subnet);
+        }
         // ---------------- Configuration ----------------
         String clusterName = System.getenv("ECS_CLUSTER");
         String serviceName = System.getenv("ECS_SERVICE");
         String image = System.getenv("DOCKER_IMAGE"); // ECR image:tag
         String awsRegion = System.getenv("AWS_REGION");
-        String subnetCsv = System.getenv("SUBNETS");       // comma-separated
+//        String subnetCsv = System.getenv("SUBNETS");       // comma-separated
         String sgCsv = System.getenv("SECURITY_GROUPS");  // comma-separated
 
-        String[] subnets = subnetCsv.split(",");
+//        String[] subnets = subnetCsv.split(",");
         String[] securityGroups = sgCsv.split(",");
 
 
