@@ -106,6 +106,7 @@ public class ECSDeployer {
                                 )
                         );
 
+
                 ecs.createService(createRequest);
                 System.out.println("ECS Service created: " + serviceName);
             } else {
