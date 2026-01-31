@@ -1,7 +1,7 @@
 # -----------------------------
 # 1️⃣ Build stage
 # -----------------------------
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM maven:3.9.3-eclipse-temurin-21-slim AS build
 LABEL authors="Sudip"
 WORKDIR /build
 COPY pom.xml .
@@ -12,7 +12,7 @@ RUN mvn clean package -DskipTests
 # -----------------------------
 # 1️⃣ Runtime stage
 # -----------------------------
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 RUN addgroup -S app && adduser -S app -G app
 USER app
 WORKDIR /app
