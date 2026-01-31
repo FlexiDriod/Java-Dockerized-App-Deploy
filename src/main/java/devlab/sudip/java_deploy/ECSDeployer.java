@@ -26,15 +26,15 @@ public class ECSDeployer {
         }
 
         // ---------------- Configuration ----------------
-        String clusterName = System.getenv("ECS_CLUSTER");
-        String serviceName = System.getenv("ECS_SERVICE");
-        String image = System.getenv("DOCKER_IMAGE");
-        String awsRegion = System.getenv("AWS_REGION");
+        String clusterName = "enterprise-java-cluster";
+        String serviceName = "java-docker-service";
+        String image = "450372565696.dkr.ecr.ap-south-1.amazonaws.com/java-docker-app:latest";
+        String awsRegion = "ap-south-1";
          if (clusterName == null || serviceName == null || image == null || awsRegion == null) {
             throw new RuntimeException("One or more required environment variables are missing");
         }
 
-        String sgCsv = System.getenv("SECURITY_GROUPS");
+        String sgCsv = "sg-0cf408909ee78d94e";
         if (sgCsv == null || sgCsv.isBlank()) {
             throw new RuntimeException("SECURITY_GROUPS env variable is not set");
         }
